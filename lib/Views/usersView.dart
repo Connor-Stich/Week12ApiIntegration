@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import '../Repositories/UserClient.dart';
+import 'addUserView.dart';
 
 import '../Models/User.dart';
 
 class UsersView extends StatefulWidget {
+  
   final List<User> inUsers;
-  const UsersView({Key? key, required this.inUsers}) : super(key: key);
+  UsersView({Key? key, required this.inUsers}) : super(key: key);
 
   @override
   State<UsersView> createState() => _UsersViewState(inUsers);
@@ -14,6 +17,25 @@ bool _loading = false;
 
 class _UsersViewState extends State<UsersView> {
   _UsersViewState(users);
+
+  final UserClient userClient = UserClient();
+
+  void buttonAddPress() {
+    Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: ((context) => CreateUserPage())));
+  }
+
+  void buttonDeleteConfirm() async {
+    try {
+      //bool success = await userClient.deleteUser(id);
+    }
+    catch (error) {
+      print(error);
+      return null;
+    }
+  }
 
   late List<User> users = widget.inUsers;
 
@@ -42,14 +64,10 @@ class _UsersViewState extends State<UsersView> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: <Widget>[
-                        TextButton(
-                          child: const Text('UPDATE'),
-                          onPressed: () {/* ... */},
-                        ),
                         const SizedBox(width: 8),
                         TextButton(
-                          child: const Text('DELETE'),
-                          onPressed: () {/* ... */},
+                          child: DialogExample(),
+                          onPressed: () {},
                         ),
                         const SizedBox(width: 8),
                       ],
@@ -59,8 +77,42 @@ class _UsersViewState extends State<UsersView> {
               ),
             );
           }).toList(),
-        )),
+        ),),
+        floatingActionButton: FloatingActionButton(
+          onPressed: buttonAddPress,
+          child: Text("Add"),
+        ), 
       ),
+    );
+  }
+}
+
+
+
+class DialogExample extends StatelessWidget {
+  const DialogExample({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return TextButton(
+      onPressed: () => showDialog<String>(
+        context: context,
+        builder: (BuildContext context) => AlertDialog(
+          title: const Text('Delete Confirmation'),
+          content: const Text('Are you sure you want to delete this user?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.pop(context, 'Cancel'),
+              child: const Text('Cancel'),              
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context, 'OK'),
+              child: const Text('OK'),
+            ),
+          ],
+        ),
+      ),
+      child: const Text('DELETE'),
     );
   }
 }

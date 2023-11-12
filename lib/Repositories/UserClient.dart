@@ -10,6 +10,62 @@ class UserClient {
   final _dio = Dio(BaseOptions(baseUrl: BaseUrl));
   DataService _dataService = DataService();
 
+  // Added functionality
+  Future<bool> createUser(String username, String password, String email, String authLevel) async {
+    try {
+      var token = await _dataService.TryGetItem("token");
+      if (token != null) {
+        var response = await _dio.post("/AddUser",
+          options: Options(
+            headers: {
+              "Content-Type": "application/json",
+              "Accept": "application/json",
+              "Authorization": "Bearer $token"
+            },
+          ),
+          data: {
+            'username': username,'password': password,'email': email,'authLevel': authLevel,
+          },
+        );
+
+        return response.data['success'];
+      } else {
+        return false;
+      }
+    } catch (error) {
+      print(error);
+      return false;
+    }
+  }
+
+  Future<bool> deleteUser(String id) async {
+    try {
+      var token = await _dataService.TryGetItem("token");
+      if (token != null) {
+        var response = await _dio.post("/DeleteUserById",options: Options(
+            headers: {
+              "Content-Type": "application/json",
+              "Accept": "application/json",
+              "Authorization": "Bearer $token"
+            },
+          ),
+          data: {
+            'id': id
+          },
+        );
+        return response.data['success'];
+      }
+      else {
+        return false;
+      }
+    } catch (error) {
+      print(error);
+      return false;
+    }
+  }
+
+  
+
   Future<AuthResponse?> Login(LoginStructure user) async {
     try {
       var response = await _dio.post("/login",
